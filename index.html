@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura — Student Screen Habit & Wellbeing Analyzer</title>
+  <!-- Google Fonts: Outfit for headers, Inter for UI text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient glowing spheres -->
+  <div class="ambient-glow" aria-hidden="true">
+    <div class="glow-sphere glow-sphere--violet"></div>
+    <div class="glow-sphere glow-sphere--amber"></div>
+    <div class="glow-sphere glow-sphere--teal"></div>
+  </div>
+
+  <header class="navbar">
+    <div class="navbar__container">
+      <div class="brand">
+        <svg class="brand__logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          <path d="M2 12h20" />
+        </svg>
+        <span class="brand__name">AURA</span>
+      </div>
+      <div class="navbar__tagline">Mental Health Prediction Hub</div>
+    </div>
+  </header>
+
+  <main class="main-layout">
+    
+    <!-- LEFT: Predictor Form -->
+    <section class="form-container" aria-labelledby="heading-form">
+      <div class="intro">
+        <span class="badge">Predictive ML Model</span>
+        <h1 id="heading-form" class="intro__title">
+          Habits vs. <em>Wellbeing</em>
+        </h1>
+        <p class="intro__desc">
+          Provide your demographic details and screen-time behaviors to estimate a predicted mental health index derived from student analytical models.
+        </p>
+      </div>
+
+      <form id="predict-form" novalidate>
+        
+        <!-- Troubleshooting & Error Banners -->
+        <div id="error-banner" class="error-banner" hidden>
+          <div class="error-banner__header">
+            <svg class="icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span id="error-title">Submission Error</span>
+          </div>
+          <div id="error-message" class="error-banner__body"></div>
+          
+          <!-- Detailed troubleshooting checklist for API/Server problems -->
+          <div id="troubleshooting-checklist" class="troubleshooting-card" hidden>
+            <h4>Troubleshooting Guide:</h4>
+            <ul>
+              <li><strong>FastAPI Server Status:</strong> Is your backend running? Verify by terminal command <code>uvicorn main:app --port 8000 --reload</code>.</li>
+              <li><strong>Local endpoint check:</strong> Visit <a href="http://127.0.0.1:8000/" target="_blank">http://127.0.0.1:8000/</a> in your browser. It should say <code>["Welcome"]</code>.</li>
+              <li><strong>Mixed Content Blocks:</strong> If this frontend is loaded over <code>https://</code>, the browser will block requests to <code>http://127.0.0.1:8000</code>. Run index.html locally via a local HTTP server or the <code>file://</code> protocol.</li>
+              <li><strong>Model File Check:</strong> Make sure the <code>Mental_Health_Model.pkl</code> file is in the folder where you launched uvicorn.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 1: Demographics -->
+        <div class="form-group">
+          <h2 class="form-group__title">1. Demographics</h2>
+          
+          <div class="field">
+            <label for="age">Age</label>
+            <div class="range-wrapper">
+              <input type="range" id="age" name="age" min="10" max="100" step="1" value="20" />
+              <output for="age" id="age-out" class="range-val">20</output>
+            </div>
+            <div class="range-bounds">
+              <span>Min: 10</span>
+              <span>Max: 100</span>
+            </div>
+            <span class="field-error" id="age-error" aria-live="polite"></span>
+          </div>
+
+          <div class="grid-2-col">
+            <div class="field">
+              <span class="field-label">Gender</span>
+              <div class="segmented-control">
+                <label class="segment-pill">
+                  <input type="radio" name="gender" value="Male" checked />
+                  <span class="segment-btn">Male</span>
+                </label>
+                <label class="segment-pill">
+                  <input type="radio" name="gender" value="Female" />
+                  <span class="segment-btn">Female</span>
+                </label>
+              </div>
+              <span class="field-error" id="gender-error" aria-live="polite"></span>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Academic Level</span>
+              <div class="segmented-control font-sm">
+                <label class="segment-pill">
+                  <input type="radio" name="academic_level" value="High School" />
+                  <span class="segment-btn">High School</span>
+                </label>
+                <label class="segment-pill">
+                  <input type="radio" name="academic_level" value="Undergraduate" checked />
+                  <span class="segment-btn">Undergraduate</span>
+                </label>
+                <label class="segment-pill">
+                  <input type="radio" name="academic_level" value="Graduate" />
+                  <span class="segment-btn">Graduate</span>
+                </label>
+              </div>
+              <span class="field-error" id="academic_level-error" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="country">Country</label>
+            <div class="input-autocomplete-wrapper">
+              <input type="text" id="country" name="country" value="India" placeholder="Type your country, e.g. India" list="country-list" required autocomplete="off" />
+              <datalist id="country-list">
+                <option value="India"></option>
+                <option value="Canada"></option>
+                <option value="Australia"></option>
+                <option value="UK"></option>
+                <option value="Germany"></option>
+                <option value="Mexico"></option>
+                <option value="Turkey"></option>
+                <option value="France"></option>
+                <option value="Other"></option>
+              </datalist>
+            </div>
+            <span class="field-error" id="country-error" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <!-- Section 2: Screen & Digital Habits -->
+        <div class="form-group">
+          <h2 class="form-group__title">2. Digital Footprint</h2>
+
+          <div class="field">
+            <span class="field-label">Most Used Platform</span>
+            <div class="platform-grid">
+              <!-- Instagram selection value -->
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="Instagram" checked />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
+                  <span>Instagram</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="TikTok" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-tiktok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+                  </svg>
+                  <span>TikTok</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="YouTube" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-youtube" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                  </svg>
+                  <span>YouTube</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="Facebook" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-facebook" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                  </svg>
+                  <span>Facebook</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="Snapchat" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-snapchat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C9 2 6 4 6 7.5c0 1.8 1 3.5 2.5 4.5.5.3 1 .8 1 1.5 0 .8-.8 1.5-1.5 1.5-1.5 0-3 1.5-3 3.5v1.5h14v-1.5c0-2-1.5-3.5-3-3.5-.7 0-1.5-.7-1.5-1.5 0-.7.5-1.2 1-1.5 1.5-1 2.5-2.7 2.5-4.5C18 4 15 2 12 2z"></path>
+                  </svg>
+                  <span>Snapchat</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="Twitter" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-twitter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                  </svg>
+                  <span>Twitter</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="WhatsApp" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-whatsapp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                  </svg>
+                  <span>WhatsApp</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="WeChat" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-wechat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 10c0-3.3-2.7-6-6-6-3.3 0-6 2.7-6 6a6 6 0 0 0 2 4.5L5 18l3.5-1.5a6 6 0 0 0 2.5.5c3.3 0 6-2.7 6-6z"></path>
+                    <path d="M21 14.5c0-1.8-1-3.5-2.5-4.5V10c0 4.4-3.6 8-8 8H10a6 6 0 0 0 5 2l2.5 1-1-2.5c2.7-1 4.5-2.7 4.5-4.5z"></path>
+                  </svg>
+                  <span>WeChat</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="LinkedIn" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-linkedin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                    <rect x="2" y="9" width="4" height="12"></rect>
+                    <circle cx="4" cy="4" r="2"></circle>
+                  </svg>
+                  <span>LinkedIn</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="LINE" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 11.5c0-3.8-3.6-7-8-7s-8 3.2-8 7c0 2.2 1.3 4.1 3.5 5.2l-1 3 3.5-1.7a8.7 8.7 0 0 0 5.5.5c4.4 0 8-3.2 8-7z"></path>
+                  </svg>
+                  <span>LINE</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="KakaoTalk" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-kakao" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 11.5c0-3.8-3.6-7-8-7s-8 3.2-8 7c0 2 1 3.8 2.8 4.8l-1.3 3.2 3.8-1.5c1 .3 2 .5 2.7.5 4.4 0 8-3.2 8-7z"></path>
+                  </svg>
+                  <span>Kakao</span>
+                </div>
+              </label>
+
+              <label class="platform-card">
+                <input type="radio" name="most_used_platform" value="VKontakte" />
+                <div class="platform-card__content">
+                  <svg class="platform-card__icon text-vk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.8 12.3c-.5.5-1.1.7-1.8.7H13v-3.5h1c.6 0 1 .1 1.3.4.3.3.4.6.4 1s-.1.7-.4 1.4zm-.2-4.1c-.3.2-.7.3-1.3.3H13v-2.5h1.2c.5 0 .9.1 1.1.3.3.2.4.5.4.9s-.1.8-.4 1z"></path>
+                  </svg>
+                  <span>VKontakte</span>
+                </div>
+              </label>
+            </div>
+            <span class="field-error" id="most_used_platform-error" aria-live="polite"></span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Purpose of Use</span>
+            <div class="segmented-control">
+              <label class="segment-pill">
+                <input type="radio" name="purpose_of_use" value="Entertainment" checked />
+                <span class="segment-btn">Entertainment</span>
+              </label>
+              <label class="segment-pill">
+                <input type="radio" name="purpose_of_use" value="Networking" />
+                <span class="segment-btn">Networking</span>
+              </label>
+              <label class="segment-pill">
+                <input type="radio" name="purpose_of_use" value="Education" />
+                <span class="segment-btn">Education</span>
+              </label>
+              <label class="segment-pill">
+                <input type="radio" name="purpose_of_use" value="News" />
+                <span class="segment-btn">News</span>
+              </label>
+            </div>
+            <span class="field-error" id="purpose_of_use-error" aria-live="polite"></span>
+          </div>
+
+          <div class="field">
+            <label for="avg_daily_usage_hours">Average Daily Screen Time (Hours)</label>
+            <div class="range-wrapper">
+              <input type="range" id="avg_daily_usage_hours" name="avg_daily_usage_hours" min="6" max="24" step="0.5" value="8" />
+              <output for="avg_daily_usage_hours" id="avg_daily_usage_hours-out" class="range-val">8.0</output>
+            </div>
+            <div class="range-bounds">
+              <span>Min: 6.0h (Required)</span>
+              <span>Max: 24.0h</span>
+            </div>
+            <span class="field-error" id="avg_daily_usage_hours-error" aria-live="polite"></span>
+          </div>
+
+          <div class="field">
+            <label for="daily_unlocks">Phone Unlocks Per Day</label>
+            <input type="number" id="daily_unlocks" name="daily_unlocks" min="0" value="80" placeholder="Enter custom unlocks, e.g. 100" required />
+            <span class="field-error" id="daily_unlocks-error" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <!-- Section 3: Lifestyle & Wellbeing -->
+        <div class="form-group">
+          <h2 class="form-group__title">3. Lifestyle & Wellbeing</h2>
+
+          <div class="field">
+            <label for="study_hours">Daily Study Hours</label>
+            <div class="range-wrapper">
+              <input type="range" id="study_hours" name="study_hours" min="0" max="24" step="0.5" value="4" />
+              <output for="study_hours" id="study_hours-out" class="range-val">4.0</output>
+            </div>
+            <div class="range-bounds">
+              <span>0h</span>
+              <span>24h</span>
+            </div>
+            <span class="field-error" id="study_hours-error" aria-live="polite"></span>
+          </div>
+
+          <div class="field">
+            <label for="physical_activity_hours">Daily Physical Activity Hours</label>
+            <div class="range-wrapper">
+              <input type="range" id="physical_activity_hours" name="physical_activity_hours" min="0" max="24" step="0.5" value="1.5" />
+              <output for="physical_activity_hours" id="physical_activity_hours-out" class="range-val">1.5</output>
+            </div>
+            <div class="range-bounds">
+              <span>0h</span>
+              <span>24h</span>
+            </div>
+            <span class="field-error" id="physical_activity_hours-error" aria-live="polite"></span>
+          </div>
+
+          <div class="field">
+            <label for="sleep_hours_per_night">Hours of Sleep per Night</label>
+            <div class="range-wrapper">
+              <input type="range" id="sleep_hours_per_night" name="sleep_hours_per_night" min="0" max="24" step="0.5" value="7" />
+              <output for="sleep_hours_per_night" id="sleep_hours_per_night-out" class="range-val">7.0</output>
+            </div>
+            <div class="range-bounds">
+              <span>0h</span>
+              <span>24h</span>
+            </div>
+            <span class="field-error" id="sleep_hours_per_night-error" aria-live="polite"></span>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Current Self-Reported Stress Level</span>
+            <div class="segmented-control stress-levels">
+              <label class="segment-pill text-low">
+                <input type="radio" name="stress_level" value="Low" />
+                <span class="segment-btn">Low</span>
+              </label>
+              <label class="segment-pill text-medium">
+                <input type="radio" name="stress_level" value="Medium" checked />
+                <span class="segment-btn">Medium</span>
+              </label>
+              <label class="segment-pill text-high">
+                <input type="radio" name="stress_level" value="High" />
+                <span class="segment-btn">High</span>
+              </label>
+              <label class="segment-pill text-veryhigh">
+                <input type="radio" name="stress_level" value="Very High" />
+                <span class="segment-btn">Very High</span>
+              </label>
+            </div>
+            <span class="field-error" id="stress_level-error" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <!-- Submit Button for Mobile -->
+        <button type="submit" id="submit-btn-mobile" class="btn-submit btn-submit--mobile">
+          <span class="btn-submit__label">Get Mental Health Analysis</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- RIGHT: Live Predictor Result Card -->
+    <aside class="result-sticky-container" aria-labelledby="heading-result">
+      <div class="result-card">
+        <h2 id="heading-result" class="result-card__title">Prediction Score</h2>
+        
+        <!-- Interactive scale settings config -->
+        <div class="scale-info-bubble">
+          <div class="scale-info-bubble__desc">
+            This ML score is visualized assuming a standard 0–10 rating.
+          </div>
+          <div class="scale-toggle">
+            <label class="toggle-switch">
+              <input type="checkbox" id="direction-toggle" />
+              <span class="toggle-slider"></span>
+            </label>
+            <span id="direction-label">Lower Score = Good (Distress Index)</span>
+          </div>
+        </div>
+
+        <div class="gauge-container" id="score-gauge">
+          <svg class="gauge-svg" viewBox="0 0 220 220">
+            <defs>
+              <!-- Glowing gradient for distress (bad) vs positive wellbeing (good) -->
+              <linearGradient id="healthyGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0bd2d2" />
+                <stop offset="100%" stop-color="#6fe3b4" />
+              </linearGradient>
+              <linearGradient id="warningGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ffb463" />
+                <stop offset="100%" stop-color="#ff6e86" />
+              </linearGradient>
+              <filter id="glow-effect" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#8c7cfb" flood-opacity="0.3"/>
+              </filter>
+            </defs>
+            <!-- Background circle -->
+            <circle class="gauge-track" cx="110" cy="110" r="92" />
+            <!-- Animated progress circle -->
+            <circle class="gauge-progress" id="gauge-progress-circle" cx="110" cy="110" r="92" filter="url(#glow-effect)" />
+          </svg>
+          <div class="gauge-overlay">
+            <span class="gauge-value" id="result-score-val">—</span>
+            <span class="gauge-label-max" id="max-label">score</span>
+          </div>
+        </div>
+
+        <div class="result-explanation">
+          <div id="result-badge" class="score-badge">Idle</div>
+          <p id="result-summary" class="result-text">
+            Configure your habits and click the button to trigger the machine learning model prediction.
+          </p>
+        </div>
+
+        <button type="submit" form="predict-form" id="submit-btn-desktop" class="btn-submit btn-submit--desktop">
+          <span class="btn-submit__label">Calculate Analysis</span>
+        </button>
+
+        <button type="button" id="reset-button" class="btn-reset" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+          </svg>
+          Reset form fields
+        </button>
+
+        <div class="result-footer">
+          ML prediction based on user-provided training features. This estimation is purely informational.
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
